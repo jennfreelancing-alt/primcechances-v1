@@ -36,8 +36,12 @@ export const useFlutterwavePayment = () => {
     }
 
     try {
+      console.log('🔄 Starting payment process...');
+      
       // Load Flutterwave script
+      console.log('📜 Loading Flutterwave script...');
       await loadFlutterwaveScript();
+      console.log('✅ Flutterwave script loaded successfully');
 
       const userName = user.user_metadata?.full_name || user.email || 'User';
       const amount = proPrice;
@@ -46,14 +50,35 @@ export const useFlutterwavePayment = () => {
         mode: isLiveMode() ? 'LIVE' : 'TEST',
         amount,
         userEmail: user.email,
-        planType
+        planType,
+        userName
       });
 
+      // Check if Flutterwave is available
+      if (!window.FlutterwaveCheckout) {
+        throw new Error('Flutterwave checkout not available');
+      }
+
+      console.log('🚀 Initializing Flutterwave payment...');
+      
+      // Set a timeout to prevent getting stuck
+      const paymentTimeout = setTimeout(() => {
+        console.error('⏰ Payment initialization timeout');
+        toast({
+          title: 'Payment Timeout',
+          description: 'Payment system is taking too long to load. Please try again.',
+          variant: 'destructive',
+        });
+        setIsProcessing(false);
+      }, 30000); // 30 second timeout
+      
       initializeFlutterwavePayment(
         amount,
         user.email || '',
         userName,
         async (response) => {
+          clearTimeout(paymentTimeout);
+          console.log('💳 Payment response received:', response);
           console.log('Payment response:', response);
           
           if (response.status === 'successful') {
@@ -110,15 +135,20 @@ export const useFlutterwavePayment = () => {
           setIsProcessing(false);
         },
         () => {
-          console.log('Payment cancelled by user');
+          clearTimeout(paymentTimeout);
+          console.log('🚫 Payment cancelled by user');
+          toast({
+            title: 'Payment Cancelled',
+            description: 'Payment was cancelled. You can try again anytime.',
+          });
           setIsProcessing(false);
         }
       );
     } catch (error) {
-      console.error('Error loading payment system:', error);
+      console.error('❌ Error in payment process:', error);
       toast({
         title: 'Payment System Error',
-        description: 'Unable to load payment system. Please try again later.',
+        description: `Unable to process payment: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
       setIsProcessing(false);

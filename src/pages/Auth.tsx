@@ -174,6 +174,7 @@ const Auth = () => {
       const redirectUrl = getAuthRedirectUrl('/reset-password');
       console.log('🔗 Using redirect URL:', redirectUrl);
       
+      // Use Supabase's default email (works) with custom redirect URL
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
