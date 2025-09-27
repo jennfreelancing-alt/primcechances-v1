@@ -4,7 +4,7 @@ import { useProSubscriptionPrice } from './useProSubscriptionPrice';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserTier } from '@/hooks/useUserTier';
 import { supabase } from '@/integrations/supabase/client';
-import { initializeFlutterwavePayment, loadFlutterwaveScript } from '@/services/flutterwaveService';
+import { initializeFlutterwavePayment, loadFlutterwaveScript, isLiveMode } from '@/services/flutterwaveService';
 import { useToast } from '@/hooks/use-toast';
 
 export const useFlutterwavePayment = () => {
@@ -41,6 +41,13 @@ export const useFlutterwavePayment = () => {
 
       const userName = user.user_metadata?.full_name || user.email || 'User';
       const amount = proPrice;
+      
+      console.log('💳 Processing payment:', {
+        mode: isLiveMode() ? 'LIVE' : 'TEST',
+        amount,
+        userEmail: user.email,
+        planType
+      });
 
       initializeFlutterwavePayment(
         amount,

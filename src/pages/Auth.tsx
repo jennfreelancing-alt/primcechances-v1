@@ -164,17 +164,16 @@ const Auth = () => {
     setResetSuccess('');
     
     try {
-      // Use the utility function to get the correct redirect URL
-      const redirectUrl = getAuthRedirectUrl('/reset-password');
-      
       console.log('📧 Password reset email details:', {
         email,
-        redirectUrl,
         currentHostname: window.location.hostname,
         currentOrigin: window.location.origin
       });
 
-      // Use Supabase's built-in password reset functionality
+      // Use Supabase's built-in password reset with correct redirect URL
+      const redirectUrl = getAuthRedirectUrl('/reset-password');
+      console.log('🔗 Using redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
@@ -183,7 +182,7 @@ const Auth = () => {
         console.error('❌ Password reset error:', error);
         setResetError(error.message);
       } else {
-        console.log('✅ Password reset email sent successfully with redirect URL:', redirectUrl);
+        console.log('✅ Password reset email sent successfully via Supabase');
         setResetSuccess('Password reset email sent! Please check your inbox and follow the link to reset your password.');
       }
     } catch (error) {

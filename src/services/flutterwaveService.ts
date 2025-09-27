@@ -23,7 +23,14 @@ declare global {
   }
 }
 
-const FLUTTERWAVE_PUBLIC_KEY = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || 'FLWPUBK_TEST-ae9bdd6c2623314033efbfee042d90d5-X';
+// Live Flutterwave Production Keys
+// IMPORTANT: Replace the public key below with your actual live public key from Flutterwave dashboard
+const FLUTTERWAVE_PUBLIC_KEY = 'FLWPUBK-REPLACE-WITH-YOUR-ACTUAL-LIVE-PUBLIC-KEY'; 
+const FLUTTERWAVE_SECRET_KEY = 'VIvvb1RIPRWuIEcbknW6Bvw42k0Xe8ck';
+const FLUTTERWAVE_ENCRYPTION_KEY = 'b5ppyrDw/1w9Uc6ufFP4dB1P2bSOVKVOiiXh5NBFsWs=';
+
+// Remove environment variable fallback and use live keys directly
+const PUBLIC_KEY = FLUTTERWAVE_PUBLIC_KEY;
 
 // Accepts dynamic price, always pass the price from the hook/service
 export const initializeFlutterwavePayment = (
@@ -34,7 +41,7 @@ export const initializeFlutterwavePayment = (
   onClose: () => void
 ) => {
   const config: FlutterwaveConfig = {
-    public_key: FLUTTERWAVE_PUBLIC_KEY,
+    public_key: PUBLIC_KEY,
     tx_ref: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     amount: amount,
     currency: 'NGN',
@@ -73,3 +80,23 @@ export const loadFlutterwaveScript = (): Promise<void> => {
     document.head.appendChild(script);
   });
 };
+
+// Export keys for server-side operations (webhook verification, etc.)
+export const getFlutterwaveKeys = () => ({
+  publicKey: FLUTTERWAVE_PUBLIC_KEY,
+  secretKey: FLUTTERWAVE_SECRET_KEY,
+  encryptionKey: FLUTTERWAVE_ENCRYPTION_KEY
+});
+
+// Verify if we're using live keys
+export const isLiveMode = (): boolean => {
+  return !FLUTTERWAVE_PUBLIC_KEY.includes('TEST');
+};
+
+// Log current configuration for debugging
+console.log('🚀 Flutterwave Configuration:', {
+  mode: isLiveMode() ? 'LIVE' : 'TEST',
+  publicKey: FLUTTERWAVE_PUBLIC_KEY.substring(0, 20) + '...',
+  hasSecretKey: !!FLUTTERWAVE_SECRET_KEY,
+  hasEncryptionKey: !!FLUTTERWAVE_ENCRYPTION_KEY
+});
