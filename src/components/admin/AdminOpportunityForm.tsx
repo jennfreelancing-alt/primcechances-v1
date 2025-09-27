@@ -54,7 +54,10 @@ const AdminOpportunityForm = ({
     console.log('AdminOpportunityForm: Starting submission', { formData, isDraft, mode });
     setSubmitting(true);
     try {
-      const isPublishing = formData.is_published && !isDraft;
+      // The "Publish Immediately" toggle determines publishing behavior
+      // When toggle is ON, both buttons publish immediately (ignore isDraft parameter)
+      // When toggle is OFF, both buttons save as draft (ignore isDraft parameter)
+      const isPublishing = formData.is_published;
       
       const baseOpportunityData = {
         title: formData.title,

@@ -7,9 +7,10 @@ interface OpportunityFormActionsProps {
   loading: boolean;
   onCancel: () => void;
   onSubmit: (isDraft?: boolean) => void;
+  publishImmediately?: boolean; // Add this to know the toggle state
 }
 
-const OpportunityFormActions = ({ userRole, loading, onCancel, onSubmit }: OpportunityFormActionsProps) => {
+const OpportunityFormActions = ({ userRole, loading, onCancel, onSubmit, publishImmediately = false }: OpportunityFormActionsProps) => {
   const isAdmin = userRole === 'admin' || userRole === 'staff_admin';
 
   return (
@@ -50,7 +51,10 @@ const OpportunityFormActions = ({ userRole, loading, onCancel, onSubmit }: Oppor
               className="bg-[#008000] hover:bg-[#006400] text-white"
             >
               <Eye className="w-4 h-4 mr-2 text-white" />
-              {loading ? 'Publishing...' : 'Create & Publish'}
+              {loading 
+                ? (publishImmediately ? 'Publishing...' : 'Saving...') 
+                : (publishImmediately ? 'Create & Publish' : 'Create & Save Draft')
+              }
             </Button>
           </>
         )}

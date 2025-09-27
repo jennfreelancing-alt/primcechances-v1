@@ -55,10 +55,16 @@ const OpportunityForm = ({
     }
     try {
       if (isAdmin) {
-        const dataToSubmit = isDraft 
-          ? { ...formData, is_published: false }
-          : formData;
-        await onSubmit(dataToSubmit, isDraft);
+        // For admin users, the "Publish Immediately" toggle determines publishing behavior
+        // If toggle is ON, both buttons publish immediately
+        // If toggle is OFF, both buttons save as draft
+        const shouldPublish = formData.is_published;
+        
+        const dataToSubmit = {
+          ...formData,
+          is_published: shouldPublish
+        };
+        await onSubmit(dataToSubmit, !shouldPublish);
       } else {
         await onSubmit(formData);
       }
@@ -114,7 +120,7 @@ const OpportunityForm = ({
               <Label className="text-sm text-gray-700">Publish Immediately</Label>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              When enabled, the opportunity will be published immediately upon creation/update.
+              When enabled, both "Save Draft" and "Create & Publish" buttons will publish the opportunity immediately. When disabled, both buttons will save as draft.
             </p>
           </div>
         )}
@@ -124,6 +130,7 @@ const OpportunityForm = ({
           loading={loading}
           onCancel={onCancel}
           onSubmit={(isDraft?: boolean) => handleSubmit(isDraft)}
+          publishImmediately={formData.is_published}
         />
       </form>
     </div>
