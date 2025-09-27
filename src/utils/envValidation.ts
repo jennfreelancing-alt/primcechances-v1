@@ -136,18 +136,30 @@ export const getSiteUrl = (): string => {
   // Check if we're in a Vercel preview or other staging environment
   if (hostname.includes('vercel.app') || hostname.includes('netlify.app') || hostname.includes('herokuapp.com')) {
     console.log('🚀 Preview/staging environment detected, using production URL');
-    return 'https://deployed.primechances.com';
+    return 'https://primechances.com';
   }
   
   // For production domain, use the current origin
-  if (hostname === 'deployed.primechances.com' || hostname === 'primechances.com') {
+  if (hostname === 'primechances.com') {
     console.log('✅ Production environment detected, using origin:', origin);
     return origin;
   }
   
-  // Default fallback to production URL
+  // Check if we're in production mode but on unknown domain - use production URL
+  if (isProduction() && !origin.includes('localhost')) {
+    console.log('✅ Production mode detected on unknown domain, using production URL');
+    return 'https://primechances.com';
+  }
+  
+  // Default fallback to production URL for any deployed environment
+  if (!origin.includes('localhost')) {
+    console.log('🚀 Deployed environment detected (non-localhost), using production URL');
+    return 'https://primechances.com';
+  }
+  
+  // Final fallback
   console.log('⚠️ Unknown environment, defaulting to production URL');
-  return 'https://deployed.primechances.com';
+  return 'https://primechances.com';
 };
 
 /**
