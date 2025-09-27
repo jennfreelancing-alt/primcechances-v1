@@ -117,12 +117,36 @@ export const isProduction = (): boolean => {
  * Gets the correct site URL based on environment
  */
 export const getSiteUrl = (): string => {
-  // In development, use current origin
-  if (isDevelopment() || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return window.location.origin;
+  const hostname = window.location.hostname;
+  const origin = window.location.origin;
+  
+  console.log('🌐 Environment detection:', {
+    hostname,
+    origin,
+    isDevelopment: isDevelopment(),
+    isProduction: isProduction()
+  });
+  
+  // Check if we're in a development environment
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('localhost')) {
+    console.log('🔧 Development environment detected, using origin:', origin);
+    return origin;
   }
   
-  // In production, use the configured production URL
+  // Check if we're in a Vercel preview or other staging environment
+  if (hostname.includes('vercel.app') || hostname.includes('netlify.app') || hostname.includes('herokuapp.com')) {
+    console.log('🚀 Preview/staging environment detected, using production URL');
+    return 'https://deployed.primechances.com';
+  }
+  
+  // For production domain, use the current origin
+  if (hostname === 'deployed.primechances.com' || hostname === 'primechances.com') {
+    console.log('✅ Production environment detected, using origin:', origin);
+    return origin;
+  }
+  
+  // Default fallback to production URL
+  console.log('⚠️ Unknown environment, defaulting to production URL');
   return 'https://deployed.primechances.com';
 };
 
