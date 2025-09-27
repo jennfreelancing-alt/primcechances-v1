@@ -78,17 +78,8 @@ const DashboardHeader = ({ user, isAdmin, adminCheckComplete, onResultSelect, on
             <SearchBar onResultSelect={onResultSelect} />
           </div>
 
-          {/* AI Assistant and Staff Admin Buttons - Desktop only */}
+          {/* Staff Admin Button - Desktop only */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/ai-assistant')}
-              className="bg-[#008000]/10 border-[#008000]/30 text-[#008000] hover:bg-[#218c1b]/20 hover:border-[#218c1b]/50 transition-all duration-300"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI Assistant
-            </Button>
             {isStaffAdmin && (
               <Button
                 asChild
@@ -137,12 +128,6 @@ const DashboardHeader = ({ user, isAdmin, adminCheckComplete, onResultSelect, on
                   </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem asChild>
-                  <Link to="/ai-assistant" className="flex items-center gap-2 cursor-pointer">
-                    <Sparkles className="h-4 w-4" />
-                    AI Assistant
-                  </Link>
-                </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                   <Link to="/subscription" className="flex items-center gap-2 cursor-pointer">
