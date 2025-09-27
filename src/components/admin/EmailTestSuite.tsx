@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail, Send, CheckCircle, AlertCircle, TestTube } from 'lucide-react';
 import { useEmail } from '@/hooks/useEmail';
-import { isEmailConfigured } from '@/utils/envValidation';
+import { isEmailConfigured, getAuthRedirectUrl } from '@/utils/envValidation';
 import { isTestModeEnabled, getTestEmailAddress } from '@/utils/emailTestConfig';
 import { sendRealTestEmail, createTestEmailTemplate } from '@/services/realEmailTest';
 
@@ -42,7 +42,7 @@ const EmailTestSuite = () => {
       action: () => sendWelcome({
         userName: testData.name,
         userEmail: testData.email,
-        loginUrl: `${window.location.origin}/dashboard`
+        loginUrl: getAuthRedirectUrl('/dashboard')
       })
     },
     {
@@ -51,7 +51,7 @@ const EmailTestSuite = () => {
       action: () => sendPasswordReset({
         userName: testData.name,
         userEmail: testData.email,
-        resetUrl: `${window.location.origin}/auth?tab=reset-password`,
+        resetUrl: getAuthRedirectUrl('/auth?tab=reset-password'),
         expiresIn: '1 hour'
       })
     },
@@ -62,7 +62,7 @@ const EmailTestSuite = () => {
         userName: testData.name,
         userEmail: testData.email,
         opportunityTitle: testData.opportunity,
-        opportunityUrl: `${window.location.origin}/opportunity/test-123`,
+        opportunityUrl: getAuthRedirectUrl('/opportunity/test-123'),
         companyName: testData.company,
         deadline: '2024-02-15'
       })

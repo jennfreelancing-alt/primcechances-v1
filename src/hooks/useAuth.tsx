@@ -3,6 +3,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { sendWelcomeEmail } from '@/services/resendService';
+import { getAuthRedirectUrl } from '@/utils/envValidation';
 
 interface AuthContextType {
   user: User | null;
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           sendWelcomeEmail({
             userName: session.user.user_metadata?.full_name || session.user.email,
             userEmail: session.user.email,
-            loginUrl: window.location.origin + '/dashboard',
+            loginUrl: getAuthRedirectUrl('/dashboard'),
           }).catch((e) => console.warn('Welcome email send failed silently:', e));
         }
       }

@@ -114,13 +114,35 @@ export const isProduction = (): boolean => {
 };
 
 /**
+ * Gets the correct site URL based on environment
+ */
+export const getSiteUrl = (): string => {
+  // In development, use current origin
+  if (isDevelopment() || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return window.location.origin;
+  }
+  
+  // In production, use the configured production URL
+  return 'https://deployed.primechances.com';
+};
+
+/**
+ * Gets the correct redirect URL for authentication flows
+ */
+export const getAuthRedirectUrl = (path: string = ''): string => {
+  const baseUrl = getSiteUrl();
+  return `${baseUrl}${path}`;
+};
+
+/**
  * Environment-specific configuration
  */
 export const getEnvironmentConfig = () => {
   const baseConfig = {
     isDevelopment: isDevelopment(),
     isProduction: isProduction(),
-    emailConfigured: isEmailConfigured()
+    emailConfigured: isEmailConfigured(),
+    siteUrl: getSiteUrl()
   };
 
   if (baseConfig.isDevelopment) {

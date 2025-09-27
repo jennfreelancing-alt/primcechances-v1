@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FullScreenSignup } from '@/components/ui/full-screen-signup';
 import OnboardingSteps from '@/components/auth/OnboardingSteps';
 import { useEmail } from '@/hooks/useEmail';
+import { getAuthRedirectUrl } from '@/utils/envValidation';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -55,7 +56,7 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: getAuthRedirectUrl('/dashboard'),
           data: {
             full_name: fullName
           }
@@ -82,7 +83,7 @@ const Auth = () => {
           await sendWelcome({
             userName: fullName || 'User',
             userEmail: email,
-            loginUrl: `${window.location.origin}/dashboard`
+            loginUrl: getAuthRedirectUrl('/dashboard')
           });
         } catch (error) {
           console.error('Failed to send welcome email:', error);
@@ -163,9 +164,12 @@ const Auth = () => {
     setResetSuccess('');
     
     try {
+      // Use the utility function to get the correct redirect URL
+      const redirectUrl = getAuthRedirectUrl('/reset-password');
+
       // Use Supabase's built-in password reset functionality
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: redirectUrl,
       });
 
       if (error) {

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, XCircle, AlertCircle, Mail, Key, User } from 'lucide-react';
 import { useEmail } from '@/hooks/useEmail';
+import { getAuthRedirectUrl } from '@/utils/envValidation';
 
 export default function PasswordResetTest() {
   const [testEmail, setTestEmail] = useState('jenn.freelancing@gmail.com');
@@ -23,7 +24,7 @@ export default function PasswordResetTest() {
       const result = await sendPasswordReset({
         userName: 'Test User',
         userEmail: testEmail,
-        resetUrl: `${window.location.origin}/auth?tab=reset-password&token=test123`,
+        resetUrl: getAuthRedirectUrl('/auth?tab=reset-password&token=test123'),
         expiresIn: '1 hour'
       });
 

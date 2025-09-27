@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { useEmail } from '@/hooks/useEmail';
-import { isEmailConfigured } from '@/utils/envValidation';
+import { isEmailConfigured, getAuthRedirectUrl } from '@/utils/envValidation';
 import { isTestModeEnabled, getTestEmailAddress } from '@/utils/emailTestConfig';
 
 const EmailTest = () => {
@@ -31,13 +31,13 @@ const EmailTest = () => {
       await sendWelcome({
         userName: testData.name,
         userEmail: testData.email,
-        loginUrl: `${window.location.origin}/dashboard`
+        loginUrl: getAuthRedirectUrl('/dashboard')
       });
     } else {
       await sendPasswordReset({
         userName: testData.name,
         userEmail: testData.email,
-        resetUrl: `${window.location.origin}/auth?tab=reset-password`,
+        resetUrl: getAuthRedirectUrl('/auth?tab=reset-password'),
         expiresIn: '1 hour'
       });
     }

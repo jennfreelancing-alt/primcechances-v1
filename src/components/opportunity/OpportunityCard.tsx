@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { DocumentGeneratorModal } from '@/components/ai/DocumentGeneratorModal';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { getAuthRedirectUrl } from '@/utils/envValidation';
 
 interface OpportunityCardProps {
   opportunity: {
@@ -49,7 +50,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareUrl = `${window.location.origin}/opportunity/${opportunity.id}`;
+    const shareUrl = getAuthRedirectUrl(`/opportunity/${opportunity.id}`);
     
     try {
       if (navigator.share) {

@@ -19,7 +19,15 @@ const ResetPassword = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        console.log('🔍 Checking session for password reset...');
+        console.log('📍 Current URL:', window.location.href);
+        console.log('📍 URL Hash:', window.location.hash);
+        console.log('📍 URL Search:', window.location.search);
+        
         const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log('🔑 Current session:', session);
+        console.log('❌ Session error:', error);
         
         if (error) {
           console.error('Session check error:', error);
@@ -35,24 +43,53 @@ const ResetPassword = () => {
           const refreshToken = hashParams.get('refresh_token');
           const type = hashParams.get('type');
 
-          if (type === 'recovery' && accessToken && refreshToken) {
-            // Set the session from URL fragments
-            const { data, error: sessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken
-            });
+          console.log('🔍 Hash parameters:', {
+            accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : null,
+            refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : null,
+            type
+          });
 
-            if (sessionError) {
-              console.error('Session set error:', sessionError);
-              setError('Invalid or expired reset link. Please request a new password reset.');
-            } else {
-              setValidSession(true);
-              toast.success('Reset link verified. You can now set a new password.');
+          if (type === 'recovery' && accessToken && refreshToken) {
+            console.log('✅ Valid recovery tokens found, setting session...');
+            
+            try {
+              // Set the session from URL fragments
+              const { data, error: sessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+              });
+
+              console.log('🔑 Session set result:', { data, error: sessionError });
+
+              if (sessionError) {
+                console.error('Session set error:', sessionError);
+                
+                // Provide more specific error messages
+                if (sessionError.message.includes('expired')) {
+                  setError('Reset link has expired. Please request a new password reset.');
+                } else if (sessionError.message.includes('invalid')) {
+                  setError('Invalid reset link. Please request a new password reset.');
+                } else {
+                  setError(`Reset link error: ${sessionError.message}`);
+                }
+              } else if (data.session) {
+                setValidSession(true);
+                toast.success('Reset link verified. You can now set a new password.');
+              } else {
+                setError('Failed to establish session. Please try again.');
+              }
+            } catch (sessionErr) {
+              console.error('Session setting failed:', sessionErr);
+              setError('Failed to process reset link. Please request a new password reset.');
             }
           } else {
+            console.log('❌ Invalid or missing recovery tokens');
+            console.log('Expected: type=recovery, access_token, refresh_token');
+            console.log('Found:', { type, hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
             setError('Invalid or expired reset link. Please request a new password reset.');
           }
         } else {
+          console.log('✅ Existing session found');
           setValidSession(true);
         }
       } catch (err) {
