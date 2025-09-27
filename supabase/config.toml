@@ -1,0 +1,43 @@
+project_id = "hieypblvsqqpkdcwmnpc"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[auth]
+enabled = true
+site_url = "https://deployed.primechances.com"
+additional_redirect_urls = ["https://*.vercel.app"]
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[functions.ai-chat-assistant]
+verify_jwt = false
+
+[functions.ai-recommendation-engine]
+verify_jwt = false
+
+[functions.document-generator]
+verify_jwt = false
+
+[functions.assign-admin-roles]
+verify_jwt = false
+
+[functions.web-scraper]
+verify_jwt = false
+
+[functions.deadline-manager]
+verify_jwt = false
