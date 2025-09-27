@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flutterwave Test</title>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+</head>
+<body>
+    <h1>Flutterwave Payment Test</h1>
+    <button onclick="testPayment()">Test Payment</button>
+    
+    <script>
+        function testPayment() {
+            const config = {
+                PBFPubKey: 'FLWPUBK-a86bee4861896fde208170d70627a304-X',
+                tx_ref: 'test_' + Date.now(),
+                amount: 100,
+                currency: 'NGN',
+                country: 'NG',
+                payment_options: 'card,mobilemoney,ussd,banktransfer',
+                customer: {
+                    email: 'test@example.com',
+                    name: 'Test User',
+                    phone_number: '',
+                },
+                customizations: {
+                    title: 'PrimeChances Test',
+                    description: 'Test Payment',
+                    logo: '',
+                },
+                callback: function(response) {
+                    console.log('Payment response:', response);
+                    alert('Payment successful: ' + response.transaction_id);
+                },
+                onclose: function() {
+                    console.log('Payment closed');
+                    alert('Payment cancelled');
+                },
+                redirect_url: window.location.origin + '/test-success.html'
+            };
+            
+            console.log('Calling FlutterwaveCheckout...');
+            FlutterwaveCheckout(config);
+        }
+    </script>
+</body>
+</html>

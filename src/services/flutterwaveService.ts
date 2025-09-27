@@ -15,10 +15,6 @@ interface FlutterwaveConfig {
     description: string;
     logo: string;
   };
-  meta: {
-    consumer_id: string;
-    consumer_mac: string;
-  };
   callback: (response: any) => void;
   onclose: () => void;
   redirect_url: string;
@@ -50,7 +46,7 @@ export const initializeFlutterwavePayment = (
 ) => {
   const config: FlutterwaveConfig = {
     PBFPubKey: PUBLIC_KEY,
-    tx_ref: `primechances_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    tx_ref: `primechances_${Date.now()}`,
     amount: amount,
     currency: 'NGN',
     country: 'NG',
@@ -63,14 +59,10 @@ export const initializeFlutterwavePayment = (
     customizations: {
       title: 'PrimeChances Pro Subscription',
       description: 'Upgrade to Pro for premium features',
-      logo: 'https://primechances.com/logo.png',
+      logo: '',
     },
     callback: onSuccess,
     onclose: onClose,
-    meta: {
-      consumer_id: userEmail,
-      consumer_mac: '92a3b912c1d1',
-    },
     redirect_url: window.location.origin + '/dashboard',
   };
 
@@ -85,8 +77,11 @@ export const initializeFlutterwavePayment = (
   if (window.FlutterwaveCheckout) {
     console.log('🚀 Calling FlutterwaveCheckout...');
     try {
-      window.FlutterwaveCheckout(config);
-      console.log('✅ FlutterwaveCheckout called successfully');
+      // Add a small delay to ensure the modal can open
+      setTimeout(() => {
+        window.FlutterwaveCheckout(config);
+        console.log('✅ FlutterwaveCheckout called successfully');
+      }, 100);
     } catch (error) {
       console.error('❌ Error calling FlutterwaveCheckout:', error);
       throw error;
