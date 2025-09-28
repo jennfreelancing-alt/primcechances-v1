@@ -27,7 +27,6 @@ import SearchBar from '@/components/SearchBar';
 import AddOpportunityButton from '@/components/profile/AddOpportunityButton';
 import ProAIChatWidget from '@/components/ai/ProAIChatWidget';
 import UpgradePrompt from '@/components/subscription/UpgradePrompt';
-import { AIRecommendationsDashboard } from '@/components/ai/AIRecommendationsDashboard';
 import { DocumentGeneratorModal } from '@/components/ai/DocumentGeneratorModal';
 
 const Dashboard = () => {
@@ -47,7 +46,6 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
-  const [showAIRecommendations, setShowAIRecommendations] = useState(false);
 
   useEffect(() => {
     fetchUserStats();
@@ -138,32 +136,6 @@ const Dashboard = () => {
     }
   };
 
-  if (showAIRecommendations) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-[#e6f5ec]/20">
-        <DashboardHeader
-          user={user}
-          isAdmin={isAdmin}
-          adminCheckComplete={adminCheckComplete}
-          onResultSelect={handleSearchResult}
-          onSignOut={signOut}
-        />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="outline"
-              onClick={() => setShowAIRecommendations(false)}
-              className="mb-4"
-            >
-              ← Back to Dashboard
-            </Button>
-          </div>
-          <AIRecommendationsDashboard />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-[#e6f5ec]/20">

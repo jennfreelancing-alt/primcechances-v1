@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -98,15 +98,6 @@ const WelcomeSection = ({ user }: WelcomeSectionProps) => {
         transition={{ duration: 0.6, delay: 0.3 }}
         className="flex flex-col sm:flex-row gap-3"
       >
-        <Button
-          onClick={() => navigate('/ai-assistant')}
-          className="flex items-center gap-2 bg-[#008000] hover:bg-[#218c1b] text-white rounded-xl px-6 py-3 shadow-lg transition-all duration-300 font-semibold text-base"
-        >
-          <Sparkles className="w-5 h-5 mr-2" />
-          <span className="hidden sm:inline">AI Recommendations</span>
-          <span className="sm:hidden">AI Assistant</span>
-        </Button>
-
         <Button
           onClick={() => navigate('/create-opportunity')}
           className="flex items-center gap-2 bg-[#008000] hover:bg-[#218c1b] text-white rounded-xl px-6 py-3 shadow-lg transition-all duration-300 font-semibold text-base"

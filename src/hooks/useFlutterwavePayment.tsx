@@ -4,7 +4,7 @@ import { useProSubscriptionPrice } from './useProSubscriptionPrice';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserTier } from '@/hooks/useUserTier';
 import { supabase } from '@/integrations/supabase/client';
-import { initializeFlutterwavePayment, loadFlutterwaveScript, isLiveMode } from '@/services/flutterwaveService';
+import { initializeFlutterwavePayment, loadFlutterwaveScript } from '@/services/flutterwaveService';
 import { useToast } from '@/hooks/use-toast';
 
 export const useFlutterwavePayment = () => {
@@ -39,15 +39,12 @@ export const useFlutterwavePayment = () => {
       console.log('🔄 Starting payment process...');
       
       // Load Flutterwave script
-      console.log('📜 Loading Flutterwave script...');
       await loadFlutterwaveScript();
-      console.log('✅ Flutterwave script loaded successfully');
 
       const userName = user.user_metadata?.full_name || user.email || 'User';
       const amount = proPrice;
       
       console.log('💳 Processing payment:', {
-        mode: isLiveMode() ? 'LIVE' : 'TEST',
         amount,
         userEmail: user.email,
         planType,
@@ -61,27 +58,14 @@ export const useFlutterwavePayment = () => {
 
       console.log('🚀 Initializing Flutterwave payment...');
       
-      // Set a timeout to prevent getting stuck
-      const paymentTimeout = setTimeout(() => {
-        console.error('⏰ Payment initialization timeout');
-        toast({
-          title: 'Payment Timeout',
-          description: 'Payment system is taking too long to load. Please try again.',
-          variant: 'destructive',
-        });
-        setIsProcessing(false);
-      }, 30000); // 30 second timeout
-      
       initializeFlutterwavePayment(
         amount,
         user.email || '',
         userName,
         async (response) => {
-          clearTimeout(paymentTimeout);
           console.log('💳 Payment response received:', response);
-          console.log('Payment response:', response);
           
-          if (response.status === 'successful') {
+          if (response.status === 'successful' || response.status === 'completed') {
             try {
               // Create subscription record
               const { error: subscriptionError } = await supabase
@@ -125,17 +109,22 @@ export const useFlutterwavePayment = () => {
                 variant: 'destructive',
               });
             }
+          } else if (response.status === 'cancelled') {
+            toast({
+              title: 'Payment Cancelled',
+              description: 'Payment was cancelled. You can try again anytime.',
+            });
           } else {
+            console.log('Payment status:', response.status);
             toast({
               title: 'Payment Failed',
-              description: 'Your payment could not be processed. Please try again.',
+              description: `Payment could not be processed. Status: ${response.status}. Please try again.`,
               variant: 'destructive',
             });
           }
           setIsProcessing(false);
         },
         () => {
-          clearTimeout(paymentTimeout);
           console.log('🚫 Payment cancelled by user');
           toast({
             title: 'Payment Cancelled',
