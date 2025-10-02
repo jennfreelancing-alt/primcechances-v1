@@ -67,10 +67,32 @@ export const useFlutterwavePayment = () => {
           
           if (response.status === 'successful' || response.status === 'completed') {
             try {
-              // Create subscription record
+              console.log('🔄 Processing successful payment...');
+              
+              // First, ensure user profile exists and update tier
+              const { error: profileError } = await supabase
+                .from('user_profiles')
+                .upsert({ 
+                  id: user.id,
+                  subscription_tier: planType, 
+                  updated_at: new Date().toISOString(),
+                  email: user.email,
+                  full_name: user.user_metadata?.full_name || user.email
+                }, {
+                  onConflict: 'id'
+                });
+
+              if (profileError) {
+                console.error('Profile upsert error:', profileError);
+                throw profileError;
+              }
+
+              console.log('✅ User profile updated to pro');
+
+              // Then, upsert subscription record (insert or update if exists)
               const { error: subscriptionError } = await supabase
                 .from('subscriptions')
-                .insert({
+                .upsert({
                   user_id: user.id,
                   tier: planType,
                   status: 'active',
@@ -81,25 +103,36 @@ export const useFlutterwavePayment = () => {
                   current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
                   payment_provider: 'flutterwave',
                   external_subscription_id: response.transaction_id,
+                  updated_at: new Date().toISOString()
+                }, {
+                  onConflict: 'user_id'
                 });
 
-              if (subscriptionError) throw subscriptionError;
+              if (subscriptionError) {
+                console.error('Subscription upsert error:', subscriptionError);
+                throw subscriptionError;
+              }
 
-              // Update user profile tier
-              const { error: profileError } = await supabase
-                .from('user_profiles')
-                .update({ subscription_tier: planType, updated_at: new Date().toISOString() })
-                .eq('id', user.id);
+              console.log('✅ Subscription record updated');
 
-              if (profileError) throw profileError;
-
-              // Refresh user tier data
-              await refetch();
+              // Refresh user tier data with a small delay to ensure DB commit
+              console.log('🔄 Refreshing user tier data...');
+              setTimeout(async () => {
+                await refetch();
+                console.log('✅ User tier data refreshed');
+              }, 500);
+              
+              console.log('✅ Payment processing completed successfully');
 
               toast({
                 title: 'Payment Successful!',
                 description: 'Your account has been upgraded to Pro. Enjoy your premium features!',
               });
+
+              // Force page refresh after 2 seconds to ensure UI updates
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
 
             } catch (error) {
               console.error('Error updating subscription:', error);
